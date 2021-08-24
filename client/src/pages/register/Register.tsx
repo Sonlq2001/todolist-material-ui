@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
 	Container,
@@ -18,16 +18,15 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import InputField from "./../../customField/InputField";
 import ButtonFiled from "./../../customField/ButtonField";
 
-import { valueFormRegister } from "./../../interface/interface";
+import { ValueForm } from "../../types/shape";
 import { userRegister } from "./../../redux/slices/userSlice";
 import { RootState } from "./../../redux/store";
 
 const Register = () => {
 	const classes = useStyle();
 	const dispatch = useDispatch();
-	const history = useHistory();
 	const { msg } = useSelector((state: RootState) => state.user);
-	const initialValues: valueFormRegister = { name: "", email: "", password: "" };
+	const initialValues: ValueForm = { username: "", password: "" };
 
 	return (
 		<Container component="main" maxWidth="xs">
@@ -48,15 +47,12 @@ const Register = () => {
 
 				<Formik
 					initialValues={initialValues}
-					onSubmit={(values: valueFormRegister) => {
-						const mixValue: any = { history, values };
-						dispatch(userRegister(mixValue));
+					onSubmit={(values: ValueForm, { resetForm }) => {
+						dispatch(userRegister(values));
+						resetForm();
 					}}
 					validationSchema={Yup.object().shape({
-						name: Yup.string().required("Vui lòng nhập tên !"),
-						email: Yup.string()
-							.email("Email không phù hợp !")
-							.required("Vui lòng nhập email !"),
+						username: Yup.string().required("Vui lòng nhập tên tài khoản !"),
 						password: Yup.string()
 							.trim()
 							.min(8, "Độ dài mật khẩu tối thiểu 8 kí tự")
@@ -71,12 +67,8 @@ const Register = () => {
 						return (
 							<Form className={classes.form}>
 								<Grid container spacing={2}>
-									<Grid item xs={12} sm={12}>
-										<InputField name="name" label="Họ và tên" />
-									</Grid>
-
 									<Grid item xs={12}>
-										<InputField name="email" label="Email" />
+										<InputField name="username" label="Tài khoản" />
 									</Grid>
 									<Grid item xs={12}>
 										<InputField name="password" label="Mật khẩu" />

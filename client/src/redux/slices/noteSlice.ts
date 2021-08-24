@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { valueWork } from "./../../interface/interface";
+import { Todo } from "../../types/shape";
 import noteApi from "./../../api/noteApi";
 
 const initialState: any = {
@@ -7,30 +7,36 @@ const initialState: any = {
 	loading: false,
 };
 
-export const fetchData = createAsyncThunk("/fetch/note", async () => {
+export const fetchData = createAsyncThunk("/fetch/todos", async () => {
 	try {
 		const { data } = await noteApi.getAll();
 		return data;
 	} catch (error) {}
 });
 
-export const addNote = createAsyncThunk("/note/add", async (note: valueWork) => {
+export const addNote = createAsyncThunk("/add/todo", async (note: Todo) => {
 	try {
-		note._id = undefined;
+		note.id = undefined;
 		const { data } = await noteApi.add(note);
 		return data;
 	} catch (error) {}
 });
 
-export const removeNote = createAsyncThunk("/note/remove", async (id: string) => {
-	const { data } = await noteApi.remove(id);
-	return data.noteDeleted;
-});
+export const removeNote = createAsyncThunk(
+	"/remove/todo",
+	async (id: string | number | undefined) => {
+		const data = await noteApi.remove(id);
+		if (data.status === 204) {
+			return { id };
+		}
+	}
+);
 
-export const updateNote = createAsyncThunk("/note/update", async (note: valueWork) => {
+export const updateNote = createAsyncThunk("/update/todo", async (note: Todo) => {
 	try {
 		const { data } = await noteApi.update(note);
-		return data.note;
+		console.log(data);
+		return data;
 	} catch (error) {}
 });
 
@@ -44,17 +50,17 @@ const noteSlice = createSlice({
 		},
 		[fetchData.fulfilled.type]: (state, action) => {
 			state.loading = false;
-			state.data = action.payload;
+			state.data = action.payload.items;
 		},
 		[addNote.fulfilled.type]: (state, action) => {
-			state.data.push(action.payload.note);
+			state.data.push(action.payload);
 		},
 		[removeNote.fulfilled.type]: (state, action) => {
-			state.data = state.data.filter((item: any) => item._id !== action.payload._id);
+			state.data = state.data.filter((item: Todo) => item.id !== action.payload.id);
 		},
 		[updateNote.fulfilled.type]: (state, action) => {
-			state.data = state.data.map((item: any) =>
-				item._id === action.payload._id ? action.payload : item
+			state.data = state.data.map((item: Todo) =>
+				item.id === action.payload.id ? action.payload : item
 			);
 		},
 	},

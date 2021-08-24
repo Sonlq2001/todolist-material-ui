@@ -1,15 +1,16 @@
-import { axiosClient } from "./axiosClient";
+import axiosClient from "./axiosClient";
+import { AxiosResponse } from "axios";
 
-import { valueFormRegister } from "./../interface/interface";
+import { ValueForm } from "../types/shape";
 
 const authApi = {
-	register(user: valueFormRegister) {
-		const url: string = "/register";
+	register(user: ValueForm): Promise<AxiosResponse> {
+		const url: string = "/auth/register";
 		return axiosClient.post(url, user);
 	},
 
-	login(user: valueFormRegister) {
-		const url: string = "/login";
+	login(user: ValueForm): Promise<AxiosResponse> {
+		const url: string = "/auth/login";
 		return axiosClient.post(url, user);
 	},
 };

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -19,7 +19,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import InputField from "./../../customField/InputField";
 import ButtonFiled from "./../../customField/ButtonField";
 
-import { valueFormRegister } from "./../../interface/interface";
+import { ValueForm } from "../../types/shape";
 import { userLogin } from "./../../redux/slices/userSlice";
 import { RootState } from "./../../redux/store";
 
@@ -27,8 +27,12 @@ const Login = () => {
 	const classes = useStyle();
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const initialValues: valueFormRegister = { email: "", password: "" };
-	const { msg } = useSelector((state: RootState) => state.user);
+	const initialValues: ValueForm = { username: "", password: "" };
+	const { msg, user } = useSelector((state: RootState) => state.user);
+
+	useEffect(() => {
+		if (user) history.push("/");
+	}, [user, history]);
 
 	return (
 		<Container component="main" maxWidth="xs">
@@ -49,14 +53,11 @@ const Login = () => {
 
 				<Formik
 					initialValues={initialValues}
-					onSubmit={(values: valueFormRegister) => {
-						const mixValue: any = { values, history };
-						dispatch(userLogin(mixValue));
+					onSubmit={(values: ValueForm) => {
+						dispatch(userLogin(values));
 					}}
 					validationSchema={Yup.object().shape({
-						email: Yup.string()
-							.email("Email không phù hợp !")
-							.required("Vui lòng nhập email !"),
+						username: Yup.string().required("Vui lòng nhập tài khoản !"),
 						password: Yup.string().trim().required("Vui lòng nhập mật khẩu !"),
 					})}
 				>
@@ -65,14 +66,10 @@ const Login = () => {
 							<Form className={classes.form}>
 								<Grid container spacing={2}>
 									<Grid item xs={12}>
-										<InputField name="email" label="Email" />
+										<InputField name="username" label="Tài khoản" />
 									</Grid>
 									<Grid item xs={12}>
-										<InputField
-											name="password"
-											label="Mật khẩu"
-											type="password"
-										/>
+										<InputField name="password" label="Mật khẩu" type="password" />
 									</Grid>
 								</Grid>
 

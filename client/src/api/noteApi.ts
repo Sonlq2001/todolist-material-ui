@@ -1,23 +1,23 @@
-import { axiosClient } from "./axiosClient";
-import { valueWork } from "./../interface/interface";
+import axiosClient from "./axiosClient";
+import { Todo } from "../types/shape";
 const noteApi = {
 	getAll() {
-		const url: string = "/notes";
+		const url: string = "/api/todos";
 		return axiosClient.get(url);
 	},
 
-	add(note: valueWork) {
-		const url: string = "/note-add";
+	add(note: Todo) {
+		const url: string = "/api/todos";
 		return axiosClient.post(url, note);
 	},
 
-	remove(id: string) {
-		const url: string = `/note-remove/${id}`;
+	remove(id: string | number | undefined) {
+		const url: string = `/api/todos/${id}`;
 		return axiosClient.delete(url);
 	},
 
-	update(note: any) {
-		const url: string = `/note-update/${note._id}`;
+	update(note: Todo) {
+		const url: string = `/api/todos/${note.id}`;
 		return axiosClient.put(url, note);
 	},
 };
